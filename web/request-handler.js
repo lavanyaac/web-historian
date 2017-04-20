@@ -21,6 +21,7 @@ var helpers = require('./http-helpers');
 
 
 exports.handleRequest = function (req, res) {
+  // handle 'GET' request method:
   if (req.method === "GET") {
   	if(req.url === "/"){
    	  fs.readFile(archive.paths.siteAssets + '/index.html', 'utf8', function(err, data){
@@ -42,16 +43,21 @@ exports.handleRequest = function (req, res) {
       });
     }
   }
+  // handle 'POST' request method:
   if(req.method === 'POST'){
-  	console.log(req.url)
+  	// console.log(req.url)
+    var data = '';
+    // when we receive a post, collect all the data chunks
     req.on('data', function(chunk){
       // write req.url into sites.txt
+      data += chunk;
+      // console.log('POST DATA.........',data);
+  	});
+  	archive.addUrlToList(req.url, function(err, data){
+      // console.log('hiiiii')
 
-      console.log('POST DATA.........',chunk);
-  	})
-  	archive.addUrlToList(req.url, function(err){
   		if(err){
-  			console.error(err);
+  			console.log(err);
   		}
   	})
   	res.writeHead(302, helpers.headers);
