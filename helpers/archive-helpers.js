@@ -26,12 +26,20 @@ exports.initialize = function(pathsObj) {
 // modularize your code. Keep it clean!
 
 exports.readListOfUrls = function(callback) {
+	var fileContents = fs.readFile(list, 'r', callback);
+	return fileContents;
 };
 
 exports.isUrlInList = function(url, callback) {
+	var fileContents = readListOfUrls(callback);
+	return fileContents.find(url);
 };
 
 exports.addUrlToList = function(url, callback) {
+	if(isUrlInList(url, callback)){
+		return;
+	}
+	fs.appendFile(list, 'a', callback);
 };
 
 exports.isUrlArchived = function(url, callback) {
