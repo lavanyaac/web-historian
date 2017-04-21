@@ -16,25 +16,47 @@ exports.serveAssets = function(res, asset, callback) {
   // css, or anything that doesn't change often.)
   //res.writeHead(headers, )
   
-  console.log(res)
+  var encoding = {encoding: 'utf8'};
+  fs.readFile(archive.paths.siteAssets + asset, encoding, function(err, data){
+    if(err){
+      fs.readfile(archive.paths.archivedSites + asset, encoding, function(err, data){
+        if(err){
+          callback ? callback() : exports.send404(res);
+        }else{
+          exports.sendResponse(res, data);
+        }
+      });
+    }else{
+      exports.sendResponse(res, data);
+    }
+  });
 };
 
-// exports.sendResponse = function(response, data, statusCode) {
-//   statusCode = statusCode || 200;
-//   response.writeHead(statusCode, headers);
-//   response.end(JSON.stringify(data));
-// };
+exports.sendRedirect = function(response, location, status){
+  status = status || 302;
+  response.writeHead(status, {Location: location});
+  response.end();
+};
 
-// exports.collectData = function(request, callback) {
-//   var data = '';
-//   request.on('data', function(chunk) {
-//     data += chunk;
-//   });
-//   request.on('end', function() {
-//     callback(JSON.parse(data));
-//   });
-// };
+exports.sendResponse = function(response, obj, status){
+  status = status || 200;
+  response.writeHead(status, exports,headers);
+  response.end(obj);
+};
 
+exports.collectData = function(request, callback){
+  var data = '';
+  request.on('data', function(chunk){
+    data += chunk;
+  });
+  request.on('end', function(){
+    callback(data);
+  });
+};
+
+exports.send404 = function(response){
+  exports.sendResponse(response, '404: Page not found', 404);
+};
 
 
 // As you progress, keep thinking about what helper functions you can put here!
